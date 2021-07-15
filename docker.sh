@@ -1,50 +1,93 @@
 #!/usr/bin/env bash
-#
-# 2020 @leonjza
-#
-# Adjusted and repurposed from the frida-boot workshop
-#  https://github.com/leonjza/frida-boot
 
+# Convenience script for Docker-based report generation using 'noraj/OSCP-Exam-Report-Template-Markdown'.
+#
+# Credits:
+#   - Initial script by @leonjza from the frida-boot workshop (https://github.com/leonjza/frida-boot)
+#   - Adjusted and repurposed by @Tripex48 (https://github.com/Tripex48/OSCP-Exam-Report-Template-Markdown)
+#   - Refactored and improved by @ret2src (https://github.com/ret2src/OSCP-Exam-Report-Template-Markdown)
+
+# Default input and output directories on the host.
+INPUT_DIR="${PWD}/src"
+OUTPUT_DIR="${PWD}/output"
+
+# Check if Docker is installed.
 if ! hash docker 2>/dev/null; then
-    echo "Docker is required. Please install it first!"
+    echo "[-] Could not find the 'docker' command. Make sure you have Docker installed."
     exit 1
 fi
 
-if ! [[ "$1" =~ ^(pull|build|run|shell)$ ]]; then
-    echo "Usage: $0 [action]"
-    echo " Actions can be: pull; build; run; shell"
-    exit 1
-fi
+# Print usage.
+function usage() {
+   cat << HEREDOC
 
-case $1 in
+   Usage: $0 action
 
-pull)
-    echo "reserved for public. you can build it rather"
-    ;;
-build)
-    echo "> building a local image"
+   actions:
+     build    build the Docker image locally
+     run      run the Docker container
+     shell    spawn a new bash shell in the already running Docker container
+
+   optional arguments:
+     -h, --help           show this help message and exit
+     -i, --input PATH     defines an input directory for the Markdown files on the host
+                          (Default: "${PWD}/src")
+     -o, --output PATH    defines an output directory for the PDF and 7z files on the host
+                          (Default: "${PWD}/output")
+
+HEREDOC
+}
+
+# Build the Docker image locally.
+function docker_build() {
+    echo "[*] Building Docker image 'report-generator' locally ..."
     docker build -t report-generator .
-    ;;
-run)
-    echo "> start a new container with the following command,"
-    echo "  replacing FULL_PATH_TO_LOCAL_SRC_FOLDER with a"
-    echo "  local directory to store your markdown files and images."
-    echo "  Also, replacing FULL_PATH_TO_LOCAL_OUTPUT_FOLDER with a"
-    echo "  local directory to store your final PDF and/or 7z archive."
-    echo
-    echo "docker run --rm -it" \
-         "--name report-generator " \
-         "-v FULL_PATH_TO_LOCAL_SRC_FOLDER:/root/report-generator/src" \
-         "-v FULL_PATH_TO_LOCAL_OUTPUT_FOLDER:/root/report-generator/output" \
-         "report-generator"
-    echo
-    echo "> IMPORTANT: Replace the FULL_PATH_TO_LOCAL_SRC_FOLDER section with the local" \
-         "directory you want to store your markdown files and images in. ie: /home/jacquesc/src"
-    echo "> IMPORTANT: Replace the FULL_PATH_TO_LOCAL_OUTPUT_FOLDER section with the local" \
-         "directory you want to store your PDF and/or 7z archive in. ie: /home/jacquesc/output"
-    ;;
-shell)
-    echo "> spawning new shell in the report-generator container"
+}
+
+# Run the Docker container.
+function docker_run() {
+    echo "[*] Running Docker container 'report-generator' ..."
+    echo "[*] Input directory is set to: \"${INPUT_DIR}\"."
+    echo "[*] Output directory is set to: \"${OUTPUT_DIR}\"."
+    docker run --rm -it \
+         --name report-generator \
+         -v "${INPUT_DIR}:/root/report-generator/src" \
+         -v "${OUTPUT_DIR}:/root/report-generator/output" \
+         report-generator
+}
+
+# Spawn a shell in the already running Docker container.
+function docker_shell() {
     docker exec -it report-generator /bin/bash
-    ;;
-esac
+}
+
+# Make sure the user has selected a valid action.
+if ! [[ "$1" =~ ^(build|run|shell)$ ]]; then
+    usage
+    exit 1
+fi
+
+# Use `getopt` to parse command line arguments and store the output in $OPTS.
+OPTS=$(getopt -o "h:i:o:" --long "help,input:,output:" -n "$0" -- "$@")
+if [ $? != 0 ] ; then echo "[-] Error in command line arguments." >&2 ; usage; exit 1 ; fi
+eval set -- "$OPTS"
+
+# Interpret command line arguments.
+while true; do
+  case "$1" in
+    -h | --help ) usage; exit; ;;
+    -i | --input ) INPUT_DIR="$2"; shift 2 ;;
+    -o | --output ) OUTPUT_DIR="$2"; shift 2 ;;
+    -- ) case "$2" in
+            build) docker_build ;;
+            run) docker_run ;;
+            shell) docker_shell ;;
+         esac
+        break ;;
+    * ) break ;;
+  esac
+done
+
+# Clean up: Unset variables.
+unset INPUT_DIR
+unset OUTPUT_DIR
