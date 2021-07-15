@@ -83,6 +83,21 @@ You can change the code syntax highlight theme with [`--highlight-style`](https:
 
 Instead of installing Pandoc and the other dependencies on your local machine, you can use a local Docker container to generate the report PDF from the markdown template.
 
+You can either use the convenience script `docker.sh` or interact with Docker manually.
+
+#### Using the Convenience Script
+
+You can list all available options using `docker.sh -h`.
+
+Action | Description                     | Example
+-------|---------------------------------|------------------
+build  | Build the Docker image locally. | `docker.sh build`
+run    | Run the Docker container.       | `docker.sh run --input /home/user/my-markdown-files/ --output /home/user/my-offsec-report/`
+shell  | Build the Docker image locally. | `docker.sh shell`
+
+
+#### Using Docker Manually
+
 Build the local Docker image:
 
 ```
@@ -96,13 +111,9 @@ Create a Docker container from the local image:
 docker run --rm -it --name report-generator -v $(pwd)/output:/root/report-generator/output -v $(pwd)/src:/root/report-generator/src report-generator
 ```
 
-The above command will launch an Ubuntu-based container that has all the dependencies installed for the report generator to work correctly. 
+The above command will launch an Ubuntu-based container that has all the dependencies installed for the report generator to work correctly.
 
-**IMPORTANT: Replace the FULL_PATH_TO_LOCAL_SRC_FOLDER section with the local directory you want to store your markdown files and images in. ie: /home/noraj/src**
-
-**IMPORTANT: Replace the FULL_PATH_TO_LOCAL_OUTPUT_FOLDER section with the local directory you want to store your PDF and/or 7z archive in. ie: /home/noraj/output"**
-
-From within the spawned shell, you can use either the automated or the manual commands to generate the report PDF.
+From within the spawned shell, you can use either use the automated or the manual commands to generate the report PDF.
 
 ## Color sets
 
