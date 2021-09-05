@@ -93,7 +93,7 @@ Action | Description                     | Example
 -------|---------------------------------|------------------
 build  | Build the Docker image locally. | `docker.sh build`
 run    | Run the Docker container.       | `docker.sh run --input /home/user/my-markdown-files/ --output /home/user/my-offsec-report/`
-shell  | Build the Docker image locally. | `docker.sh shell`
+shell  | Spawn a shell in the container. | `docker.sh shell`
 
 
 #### Using Docker Manually
