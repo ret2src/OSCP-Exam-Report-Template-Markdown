@@ -11,7 +11,9 @@ RUN apt-get update \
       texlive-fonts-extra \
       texlive-latex-extra \
       pandoc \
-      p7zip-full
+      p7zip-full \
+ && apt-get clean \ 
+ && rm -rf /var/lib/apt/lists/*
 
 # Add required files from 'OSCP-Exam-Report-Template-Markdown' repository.
 RUN cd /root && mkdir report-generator
