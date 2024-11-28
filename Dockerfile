@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:24.04
 
 LABEL maintainer="@noraj"
 
@@ -19,8 +19,8 @@ ADD . /root/report-generator
 
 # Get Eisvogel 2.0.0 template (latest as of 2021-07-14).
 RUN mkdir /tmp/eisvogel \
-    && wget --directory-prefix /tmp/eisvogel https://github.com/Wandmalfarbe/pandoc-latex-template/releases/download/v2.0.0/Eisvogel-2.0.0.tar.gz \
-    && tar xf /tmp/eisvogel/Eisvogel-2.0.0.tar.gz --directory=/tmp/eisvogel \
+    && wget --directory-prefix /tmp/eisvogel https://github.com/Wandmalfarbe/pandoc-latex-template/releases/download/v2.5.0/Eisvogel-2.5.0.tar.gz \
+    && tar xf /tmp/eisvogel/Eisvogel-2.5.0.tar.gz --directory=/tmp/eisvogel \
     && mv /tmp/eisvogel/eisvogel.latex /usr/share/pandoc/data/templates/ \
     && rm -rf /tmp/eisvogel
 
