@@ -21,8 +21,8 @@ ADD . /root/report-generator
 
 # Get Eisvogel 2.0.0 template (latest as of 2021-07-14).
 RUN mkdir /tmp/eisvogel \
-    && wget --directory-prefix /tmp/eisvogel https://github.com/Wandmalfarbe/pandoc-latex-template/releases/download/v2.5.0/Eisvogel-2.5.0.tar.gz \
-    && tar xf /tmp/eisvogel/Eisvogel-2.5.0.tar.gz --directory=/tmp/eisvogel \
+    && wget --directory-prefix /tmp/eisvogel https://github.com/Wandmalfarbe/pandoc-latex-template/releases/download/2.4.2/Eisvogel-2.4.2.tar.gz \
+    && tar xf /tmp/eisvogel/Eisvogel-2.4.2.tar.gz --directory=/tmp/eisvogel \
     && mv /tmp/eisvogel/eisvogel.latex /usr/share/pandoc/data/templates/ \
     && rm -rf /tmp/eisvogel
 
